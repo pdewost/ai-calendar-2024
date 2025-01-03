@@ -3,23 +3,14 @@ const { useState, useEffect } = React;
 
 // Composant principal
 const App = () => {
-  // États
-  const [activeView, setActiveView] = useState(1);
-  const [openWindow, setOpenWindow] = useState(null);
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
-  const [snowflakes, setSnowflakes] = useState([]);
+  // États - correction de la syntaxe useState
+  const [activeView, setActiveView] = React.useState(1);
+  const [openWindow, setOpenWindow] = React.useState(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = React.useState(null);
+  const [snowflakes, setSnowflakes] = React.useState([]);
 
-  // Données des entreprises
-  const companies = {
-    'OpenAI': '#412991',
-    'Google': '#4285F4',
-    'xAI': '#1DA1F2',
-    'Anthropic': '#FF6B6B',
-    'Mistral': '#50C878'
-  };
-
-  // Génération des flocons de neige
-  useEffect(() => {
+  // Correction du useEffect
+  React.useEffect(() => {
     const createSnowflake = () => ({
       id: Math.random(),
       left: `${Math.random() * 100}%`,
@@ -38,7 +29,7 @@ const App = () => {
       clearInterval(interval);
     };
   }, []);
-
+  
   // Composant Flocon (déplacé à l'intérieur de App pour avoir accès au style)
   const Snowflake = ({ style }) => (
     <div 
