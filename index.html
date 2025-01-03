@@ -36,12 +36,8 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Application -->
+    <!-- Composants de base -->
     <script type="text/babel">
-        // Rendre React et ses hooks disponibles globalement
-        window.React = React;
-        const { useState, useEffect } = React;
-        
         // Composants de base
         window.Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
@@ -54,20 +50,22 @@
         window.Calendar = () => "📅";
         window.Gift = () => "🎁";
         window.Rocket = () => "🚀";
-
-        // Chargement de l'App
-        window.addEventListener('load', () => {
-            const container = document.getElementById('root');
-            const root = ReactDOM.createRoot(container);
-            if (typeof App !== 'undefined') {
-                root.render(React.createElement(App));
-            } else {
-                console.error("L'application n'a pas été correctement chargée");
-            }
-        });
     </script>
 
     <!-- Chargement de App.js -->
     <script type="text/babel" data-presets="react" src="./src/App.js"></script>
+
+    <!-- Initialisation -->
+    <script type="text/babel">
+        window.addEventListener('DOMContentLoaded', () => {
+            try {
+                const container = document.getElementById('root');
+                const root = ReactDOM.createRoot(container);
+                root.render(React.createElement(App));
+            } catch (error) {
+                console.error("Erreur lors du chargement:", error);
+            }
+        });
+    </script>
 </body>
 </html>
