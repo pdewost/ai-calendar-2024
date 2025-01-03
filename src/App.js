@@ -1,8 +1,3 @@
-
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Gift, Rocket } from 'lucide-react';
-
 const App = () => {
   // États
   const [activeView, setActiveView] = useState(1);
