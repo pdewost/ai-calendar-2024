@@ -5,12 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calendrier de l'Avent AI 2024</title>
     
-    <!-- Styles de base -->
+    <!-- Tailwind et styles de base -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React et ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Styles personnalisés -->
     <style>
-        /* Styles Tailwind essentiels */
-        @import 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
-        
-        /* Animations et styles personnalisés */
         @keyframes fall {
             0% { transform: translateY(-5vh) rotate(0deg) translateX(0); }
             50% { transform: translateY(100vh) rotate(180deg) translateX(var(--drift)); }
@@ -25,20 +31,20 @@
             border-radius: 0.5rem;
             box-shadow: 0 1px 3px rgba(0,0,0,0.12);
         }
-        .card-content { padding: 1rem; }
+        .card-content { 
+            padding: 1rem; 
+        }
+        #root {
+            min-height: 100vh;
+            padding: 1rem;
+        }
     </style>
 </head>
-<body class="bg-gray-100">
+<body>
     <div id="root"></div>
-
-    <!-- Dépendances principales -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <!-- Composants de base -->
     <script type="text/babel">
-        // Composants de base
         window.Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
         );
@@ -52,20 +58,21 @@
         window.Rocket = () => "🚀";
     </script>
 
-    <!-- Chargement de App.js -->
-    <script type="text/babel" data-presets="react" src="./src/App.js"></script>
-
-    <!-- Initialisation -->
-    <script type="text/babel">
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
+    <!-- Application -->
+    <script type="text/babel" data-presets="react" data-type="module">
+        fetch('./src/App.js')
+            .then(response => response.text())
+            .then(code => {
+                eval(Babel.transform(code, { presets: ['react'] }).code);
                 const container = document.getElementById('root');
                 const root = ReactDOM.createRoot(container);
                 root.render(React.createElement(App));
-            } catch (error) {
-                console.error("Erreur lors du chargement:", error);
-            }
-        });
+            })
+            .catch(error => {
+                console.error("Erreur lors du chargement de App.js:", error);
+                document.getElementById('root').innerHTML = 
+                    '<div style="color: red; padding: 20px;">Erreur lors du chargement de l\'application</div>';
+            });
     </script>
 </body>
 </html>
