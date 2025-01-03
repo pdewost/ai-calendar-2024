@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calendrier de l'Avent AI 2024</title>
     
-    <!-- Tailwind et styles de base -->
+    <!-- Styles de base -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- React et ReactDOM -->
@@ -15,7 +15,6 @@
     <!-- Babel -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Styles personnalisés -->
     <style>
         @keyframes fall {
             0% { transform: translateY(-5vh) rotate(0deg) translateX(0); }
@@ -38,41 +37,80 @@
             min-height: 100vh;
             padding: 1rem;
         }
+        .debug {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
     <div id="root"></div>
+    <div id="debug" class="debug"></div>
 
-    <!-- Composants de base -->
     <script type="text/babel">
-        window.Card = ({ children, className = "" }) => (
+        // Composants utilitaires
+        const Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
         );
 
-        window.CardContent = ({ children, className = "" }) => (
+        const CardContent = ({ children, className = "" }) => (
             <div className={`card-content ${className}`}>{children}</div>
         );
 
-        window.Calendar = () => "📅";
-        window.Gift = () => "🎁";
-        window.Rocket = () => "🚀";
-    </script>
+        const Calendar = () => "📅";
+        const Gift = () => "🎁";
+        const Rocket = () => "🚀";
 
-    <!-- Application -->
-    <script type="text/babel" data-presets="react" data-type="module">
-        fetch('./src/App.js')
-            .then(response => response.text())
-            .then(code => {
-                eval(Babel.transform(code, { presets: ['react'] }).code);
-                const container = document.getElementById('root');
-                const root = ReactDOM.createRoot(container);
-                root.render(React.createElement(App));
-            })
-            .catch(error => {
-                console.error("Erreur lors du chargement de App.js:", error);
-                document.getElementById('root').innerHTML = 
-                    '<div style="color: red; padding: 20px;">Erreur lors du chargement de l\'application</div>';
-            });
+        // Debug helper
+        const debug = (msg) => {
+            const debugEl = document.getElementById('debug');
+            debugEl.textContent = msg;
+        };
+
+        debug("Démarrage de l'application...");
+
+        // App Component
+        const App = () => {
+            debug("Rendu de App");
+            
+            // États
+            const [activeView, setActiveView] = React.useState(1);
+            
+            // Rendu minimal pour test
+            return (
+                <div className="max-w-4xl mx-auto bg-red-100 rounded-xl shadow-lg p-4">
+                    <h1 className="text-2xl font-bold">Calendrier de l'Avent AI 2024</h1>
+                    <div className="mt-4 flex gap-4">
+                        <button onClick={() => setActiveView(1)} className="px-4 py-2 bg-blue-500 text-white rounded">
+                            <Calendar /> Calendrier
+                        </button>
+                        <button onClick={() => setActiveView(2)} className="px-4 py-2 bg-green-500 text-white rounded">
+                            <Gift /> Timeline
+                        </button>
+                        <button onClick={() => setActiveView(3)} className="px-4 py-2 bg-purple-500 text-white rounded">
+                            <Rocket /> Entreprises
+                        </button>
+                    </div>
+                    <div className="mt-4 p-4 bg-white rounded">
+                        Vue active: {activeView}
+                    </div>
+                </div>
+            );
+        };
+
+        // Initialisation
+        debug("Initialisation...");
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+        debug("Rendu terminé");
     </script>
 </body>
 </html>
