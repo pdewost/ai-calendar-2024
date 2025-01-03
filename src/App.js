@@ -296,44 +296,7 @@ const App = () => {
     </div>
   );
 
-  // Vue par Entreprise
-  const CompanyView = () => (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-      {Object.entries(companies).map(([company, color]) => (
-        <Card key={company} className="overflow-hidden">
-          <div className="p-3 text-white font-bold" style={{backgroundColor: color}}>
-            {company}
-          </div>
-          <CardContent className="p-4">
-            {announcements
-              .filter(a => a.company === company)
-              .map((announcement) => (
-                <div 
-                  key={announcement.id}
-                  className={`mb-2 text-sm cursor-pointer p-2 rounded transition-colors
-                    ${selectedAnnouncement?.id === announcement.id && 
-                      selectedAnnouncement?.company === announcement.company
-                      ? 'bg-red-50'
-                      : 'hover:bg-gray-50'}`}
-                  onClick={() => handleAnnouncementClick(announcement)}
-                >
-                  <span className="font-medium">{announcement.id} déc:</span> {announcement.title}
-                </div>
-              ))}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
-
-  // Rendu principal
-  return (
-    <div className="max-w-4xl mx-auto bg-gray-50 rounded-xl shadow-lg overflow-hidden relative">
-      {/* En-tête festif */}
-      <div className="bg-gradient-to-r from-red-600 to-green-600 p-4 text-white relative">
-        {/* Animation de neige */}
-        <div className="fixed inset-0
-    // Vue par Entreprise
+// Vue par Entreprise
   const CompanyView = () => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
       {Object.entries(companies).map(([company, color]) => (
@@ -461,7 +424,24 @@ const App = () => {
                   {selectedAnnouncement.company} - {selectedAnnouncement.id} décembre
                 </span>
               </div>
-              <p className="mt-2 text-gray-700">{selectedAnnouncement.description}</p>
+              <p className="mt-2 text-gray-700">
+                {selectedAnnouncement.description.split(/(\bhttps?:\/\/\S+)/gi).map((part, index) => {
+                  if (part.match(/^https?:\/\//i)) {
+                    return (
+                      <a
+                        key={index}
+                        href={part}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        {part}
+                      </a>
+                    );
+                  }
+                  return part;
+                })}
+              </p>
             </div>
           </div>
         </div>
