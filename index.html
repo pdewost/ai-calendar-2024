@@ -4,20 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Calendrier de l'Avent AI 2024</title>
-    <base href="https://pdewost.github.io/ai-calendar-2024/">
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- React et ReactDOM -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Styles personnalisés -->
+    <!-- Styles de base -->
     <style>
+        /* Styles Tailwind essentiels */
+        @import 'https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css';
+        
+        /* Animations et styles personnalisés */
         @keyframes fall {
             0% { transform: translateY(-5vh) rotate(0deg) translateX(0); }
             50% { transform: translateY(100vh) rotate(180deg) translateX(var(--drift)); }
@@ -38,8 +31,14 @@
 <body class="bg-gray-100">
     <div id="root"></div>
 
+    <!-- Dépendances principales -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <!-- Composants de base -->
     <script type="text/babel">
+        // Définition des composants de base
         window.Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
         );
@@ -54,13 +53,21 @@
     </script>
 
     <!-- Application -->
-    <script type="text/babel" data-type="module" src="./src/App.js"></script>
+    <script type="text/babel" data-presets="react" src="./src/App.js"></script>
     
-    <!-- Initialisation -->
+    <!-- Initialisation après chargement -->
     <script type="text/babel">
-        const container = document.getElementById('root');
-        const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(App));
+        // Attendre que tout soit chargé
+        window.addEventListener('load', () => {
+            // S'assurer que App est défini
+            if (typeof App !== 'undefined') {
+                const container = document.getElementById('root');
+                const root = ReactDOM.createRoot(container);
+                root.render(React.createElement(App));
+            } else {
+                console.error("L'application n'a pas été correctement chargée");
+            }
+        });
     </script>
 </body>
 </html>
