@@ -33,7 +33,6 @@
             --drift: 0px;
         }
 
-        /* Ajout des styles manquants */
         .card {
             background: white;
             border-radius: 0.5rem;
@@ -48,27 +47,28 @@
 <body class="bg-gray-100">
     <div id="root"></div>
 
+    <!-- Composants de base -->
     <script type="text/babel">
         // Composants simplifiés pour remplacer les dépendances
-        const Card = ({ children, className = "" }) => (
+        window.Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
         );
 
-        const CardContent = ({ children, className = "" }) => (
+        window.CardContent = ({ children, className = "" }) => (
             <div className={`card-content ${className}`}>{children}</div>
         );
 
         // Icônes simplifiées
-        const Calendar = () => "📅";
-        const Gift = () => "🎁";
-        const Rocket = () => "🚀";
+        window.Calendar = () => "📅";
+        window.Gift = () => "🎁";
+        window.Rocket = () => "🚀";
+    </script>
 
-        // Code de l'App
-        const App = () => {
-            // [Copiez ici tout le contenu de App.js SAUF les imports]
-        };
-
-        // Rendu
+    <!-- Application -->
+    <script type="text/babel" src="src/App.js"></script>
+    
+    <!-- Initialisation -->
+    <script type="text/babel">
         const container = document.getElementById('root');
         const root = ReactDOM.createRoot(container);
         root.render(<App />);
