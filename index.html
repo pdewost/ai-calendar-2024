@@ -36,9 +36,12 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Composants de base -->
     <script type="text/babel">
-        // Définition des composants de base
+        // Rendre React et ses hooks disponibles globalement
+        window.React = React;
+        const { useState, useEffect } = React;
+        
+        // Composants de base
         window.Card = ({ children, className = "" }) => (
             <div className={`card ${className}`}>{children}</div>
         );
@@ -50,16 +53,9 @@
         window.Calendar = () => "📅";
         window.Gift = () => "🎁";
         window.Rocket = () => "🚀";
-    </script>
 
-    <!-- Application -->
-    <script type="text/babel" data-presets="react" src="./src/App.js"></script>
-    
-    <!-- Initialisation après chargement -->
-    <script type="text/babel">
-        // Attendre que tout soit chargé
-        window.addEventListener('load', () => {
-            // S'assurer que App est défini
+        // Fonction pour initialiser l'application
+        function initApp() {
             if (typeof App !== 'undefined') {
                 const container = document.getElementById('root');
                 const root = ReactDOM.createRoot(container);
@@ -67,7 +63,15 @@
             } else {
                 console.error("L'application n'a pas été correctement chargée");
             }
-        });
+        }
+    </script>
+
+    <!-- Application -->
+    <script type="text/babel" data-presets="react" src="./src/App.js"></script>
+    
+    <!-- Initialisation après chargement -->
+    <script>
+        window.addEventListener('load', initApp);
     </script>
 </body>
 </html>
