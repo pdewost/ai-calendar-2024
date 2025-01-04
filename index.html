@@ -1,68 +1,393 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Calendrier de l'Avent AI 2024</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier de l'Avent IA - Décembre 2024</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        @keyframes fall {
-            0% { transform: translateY(-5vh) rotate(0deg) translateX(0); }
-            50% { transform: translateY(100vh) rotate(180deg) translateX(var(--drift)); }
-            100% { transform: translateY(200vh) rotate(360deg) translateX(0); }
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #2C3E50;
+            --axis-color: #2C3E50;
+            --box-bg: #ffffff;
         }
-        .animate-fall {
-            animation: fall linear forwards;
-            --drift: 0px;
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --axis-color: #ffffff;
+            --box-bg: #2C3E50;
         }
-        .card {
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
         }
-        .card-content { 
-            padding: 1rem; 
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
         }
-        #root {
-            min-height: 100vh;
-            padding: 1rem;
+
+        .title {
+            text-align: center;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            transition: color 0.3s ease;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+
+        .stats-box {
+            position: absolute;
+            top: 120px;
+            right: 91px;
+            background: var(--box-bg);
+            padding: 12px;
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 175px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: var(--text-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            opacity: 0.9;
+        }
+
+        .custom-tooltip {
+            background: var(--box-bg);
+            border: 1px solid var(--text-color);
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 14px;
+            max-width: 300px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .custom-tooltip-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .custom-tooltip-item {
+            margin: 4px 0;
+            padding-left: 12px;
+            color: var(--text-color);
+        }
+
+        .stats-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            transition: color 0.3s ease;
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div id="root"></div>
-
-    <script type="text/babel">
-        // Composants utilitaires
-        const Card = ({ children, className = "" }) => (
-            <div className={`card ${className}`}>{children}</div>
-        );
-
-        const CardContent = ({ children, className = "" }) => (
-            <div className={`card-content ${className}`}>{children}</div>
-        );
-
-        const Calendar = () => "📅";
-        const Gift = () => "🎁";
-        const Rocket = () => "🚀";
-    </script>
-
-    <script type="text/babel" src="src/App.js"></script>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Changer de thème</button>
     
-    <script type="text/babel">
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                const container = document.getElementById('root');
-                const root = ReactDOM.createRoot(container);
-                root.render(React.createElement(App));
-            } catch (error) {
-                console.error("Erreur lors du chargement:", error);
+    <div class="container">
+        <h1 class="title">🎄 Calendrier de l'Avent IA - Décembre 2024 🎅</h1>
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="stats-box">
+            <p class="stats-title">
+                📊 Total: 22 annonces
+            </p>
+            <div id="stats"></div>
+        </div>
+    </div>
+
+    <script>
+        const rawData = [
+            { date: 5, company: "OpenAI", announcement: "Launch of '12 Days of OpenAI'" },
+            { date: 5, company: "OpenAI", announcement: "o1 Reasoning Model" },
+            { date: 5, company: "AWS", announcement: "Introduction of Nova" },
+            { date: 5, company: "AWS", announcement: "Bedrock Personalization" },
+            { date: 6, company: "OpenAI", announcement: "Expansion of Reinforcement Fine-Tuning Program" },
+            { date: 9, company: "OpenAI", announcement: "Introduction of Sora Turbo" },
+            { date: 10, company: "OpenAI", announcement: "Rollout of Canvas" },
+            { date: 11, company: "OpenAI", announcement: "Integration with Apple Intelligence" },
+            { date: 11, company: "Google", announcement: "Launch of Gemini 2.0" },
+            { date: 11, company: "Google", announcement: "Introduction of Deep Research" },
+            { date: 12, company: "OpenAI", announcement: "Advanced Voice with Video" },
+            { date: 13, company: "OpenAI", announcement: "Projects Feature in ChatGPT" },
+            { date: 14, company: "OpenAI", announcement: "ChatGPT Search" },
+            { date: 15, company: "OpenAI", announcement: "15-Minute Free Call Feature" },
+            { date: 16, company: "OpenAI", announcement: "App Integration Enhancements" },
+            { date: 16, company: "Google", announcement: "Launch of Veo 2" },
+            { date: 20, company: "Google", announcement: "New AI features for Android and Pixel" },
+            { date: 21, company: "OpenAI", announcement: "Preview of o3 Reasoning Model" },
+            { date: 21, company: "xAI", announcement: "Advancements in AI Compute Scaling" },
+            { date: 24, company: "xAI", announcement: "$6 Billion Funding Round" },
+            { date: 29, company: "Anthropic", announcement: "Roadmap for AI Agent Development" },
+            { date: 29, company: "Mistral", announcement: "Launch of Mixtral 8x7B" }
+        ];
+
+        const colors = {
+            OpenAI: "#C41E3A",
+            Google: "#228B22",
+            xAI: "#FFD700",
+            Anthropic: "#4169E1",
+            Mistral: "#800080",
+            AWS: "#FF9900"
+        };
+
+        const emojis = {
+            OpenAI: "🤖",
+            Google: "🔍",
+            xAI: "⚡",
+            Anthropic: "🌟",
+            Mistral: "❄️",
+            AWS: "☁️"
+        };
+
+        const mondays = [2, 9, 16, 23, 30];
+
+        // Fonction pour générer tous les jours du mois
+        function generateAllDays() {
+            const allDays = [];
+            for(let i = 1; i <= 31; i++) {
+                allDays.push(i);
             }
-        });
+            return allDays;
+        }
+
+        const processData = () => {
+            const dateGroups = {};
+            // Initialiser tous les jours avec des données vides
+            generateAllDays().forEach(day => {
+                dateGroups[day] = {
+                    date: day,
+                    announcements: {}
+                };
+                Object.keys(colors).forEach(company => {
+                    dateGroups[day][company] = 0;
+                    dateGroups[day].announcements[company] = [];
+                });
+            });
+
+            // Ajouter les données réelles
+            rawData.forEach(item => {
+                dateGroups[item.date][item.company]++;
+                if (!dateGroups[item.date].announcements[item.company]) {
+                    dateGroups[item.date].announcements[item.company] = [];
+                }
+                dateGroups[item.date].announcements[item.company].push(item.announcement);
+            });
+
+            return Object.values(dateGroups);
+        };
+
+        let isDarkMode = false;
+        let myChart = null;
+
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+            updateChartTheme();
+        }
+
+        function createChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const data = processData();
+
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.date),
+                    datasets: Object.keys(colors).map(company => ({
+                        label: `${emojis[company]} ${company}`,
+                        data: data.map(d => d[company]),
+                        backgroundColor: colors[company],
+                        borderColor: isDarkMode ? '#ffffff' : '#2C3E50',
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: {
+                                display: false,
+                                drawBorder: true,
+                                drawOnChartArea: true,
+                                drawTicks: true
+                            },
+                            ticks: {
+                                color: isDarkMode ? '#ffffff' : '#2C3E50',
+                                callback: function(value) {
+                                    // N'afficher que les jours avec des annonces et les lundis
+                                    const hasAnnouncements = rawData.some(d => d.date === value);
+                                    const isMonday = mondays.includes(value);
+                                    return hasAnnouncements || isMonday ? value : '';
+                                }
+                            },
+                            border: {
+                                width: 3,
+                                color: isDarkMode ? '#ffffff' : '#2C3E50'
+                            }
+                        },
+                        y: {
+                            stacked: true,
+                            display: false,
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: isDarkMode ? '#ffffff' : '#2C3E50',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: false,
+                            external: function(context) {
+                                let tooltipEl = document.getElementById('chartjs-tooltip');
+
+                                if (!tooltipEl) {
+                                    tooltipEl = document.createElement('div');
+                                    tooltipEl.id = 'chartjs-tooltip';
+                                    tooltipEl.classList.add('custom-tooltip');
+                                    document.body.appendChild(tooltipEl);
+                                }
+
+                                const tooltipModel = context.tooltip;
+
+                                if (tooltipModel.opacity === 0) {
+                                    tooltipEl.style.opacity = 0;
+                                    return;
+                                }
+
+                                tooltipEl.classList.remove('above', 'below', 'no-transform');
+                                tooltipEl.style.opacity = 1;
+                                tooltipEl.style.position = 'absolute';
+                                tooltipEl.style.left = tooltipModel.caretX + 'px';
+                                tooltipEl.style.top = tooltipModel.caretY + 'px';
+                                tooltipEl.style.transform = 'translate(-50%, -100%)';
+
+                                const date = tooltipModel.dataPoints[0].label;
+                                let innerHtml = `
+                                    <div class="custom-tooltip-header">🎄 December ${date}</div>
+                                `;
+
+                                tooltipModel.dataPoints.forEach(function(dataPoint) {
+                                    const dataset = context.chart.data.datasets[dataPoint.datasetIndex];
+                                    const company = dataset.label.split(' ')[1];
+                                    const announcements = data[dataPoint.dataIndex].announcements[company];
+                                    if (announcements && announcements.length > 0) {
+                                        innerHtml += `
+                                            <div style="color: ${colors[company]}">
+                                                ${dataset.label}:
+                                            </div>
+                                        `;
+                                        announcements.forEach(announcement => {
+                                            innerHtml += `
+                                                <div class="custom-tooltip-item">• ${announcement}</div>
+                                            `;
+                                        });
+                                    }
+                                });
+
+                                tooltipEl.innerHTML = innerHtml;
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    beforeDraw: function(chart) {
+                        const ctx = chart.ctx;
+                        const xAxis = chart.scales.x;
+                        const yAxis = chart.scales.y;
+                        
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.strokeStyle = isDarkMode ? '#ffffff' : '#2C3E50';
+                        ctx.lineWidth = 1;
+                        
+                        mondays.forEach(monday => {
+                            const xPos = xAxis.getPixelForValue(monday);
+                            ctx.moveTo(xPos, yAxis.top);
+                            ctx.lineTo(xPos, yAxis.bottom);
+                        });
+                        
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }]
+            });
+        }
+
+        function updateChartTheme() {
+            createChart();
+            updateStats();
+        }
+
+        function updateStats() {
+            const totals = {};
+            rawData.forEach(item => {
+                totals[item.company] = (totals[item.company] || 0) + 1;
+            });
+
+            const statsHtml = Object.entries(totals)
+                .map(([company, count]) => 
+                    `<p style="color: ${colors[company]}; margin: 4px 0">${emojis[company]} ${company}: ${count}</p>`
+                )
+                .join('');
+            document.getElementById('stats').innerHTML = statsHtml;
+        }
+
+        // Initialisation
+        createChart();
+        updateStats();
     </script>
 </body>
 </html>
